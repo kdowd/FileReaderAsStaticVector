@@ -10,18 +10,14 @@ class FileReader {
 
 
 public:
-	static bool success;
+	bool success = false;
 	static vector<string> vec;
 
-
-	//ctor
 	FileReader(string path) {
 		filePath = path;
 		readFileAsVector();
 	}
 
-
-	// destructor
 	~FileReader() {
 		cout << "FileReader Memory Reclaimed" << "\n";
 	}
@@ -35,7 +31,6 @@ public:
 
 		if (file.fail()) {
 			FileReadFail();
-			FileReader::success = false;
 		}
 
 		if (file.good()) {
@@ -48,11 +43,22 @@ public:
 				if (line.size() > 0) {
 					FileReader::vec.push_back(line);
 				}
+
+				//contentsVector.push_back(line);
+
+
 			}
 			file.close();
 
-			FileReader::success = true;
+			// quick copy into static member var
+			//FileReader::vec.swap(contentsVector);
+
+			success = true;
 		}
+	}
+
+	auto getContentsVector() {
+		return contentsVector;
 	}
 
 	static auto getStaticVector() {
@@ -61,6 +67,7 @@ public:
 
 private:
 	string filePath;
+	vector<string>  contentsVector{};
 
 	void FileReadFail() {
 		cout << "FAIL" << "\n";
@@ -68,20 +75,24 @@ private:
 
 
 };
-// must initialize the statics once time
-bool FileReader::success = false;
+// must initialize it once
 vector<string> FileReader::vec = {};
-
 
 
 void test() {
 	FileReader fr = FileReader("data.txt");
 
-	if (FileReader::success) {
+	if (fr.success) {
+		// get a copy of the vector
+		auto contentsVector = fr.getContentsVector();
 
 		for (auto& item : FileReader::getStaticVector()) {
 			cout << " ### " << item << "\n";
 		}
+
+		cout << string(50, '*') << "\n";;
+		//cout << FileReader::getStaticVector() << "\n";;
+		cout << string(50, '*') << "\n";
 
 	}
 
